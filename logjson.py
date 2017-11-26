@@ -1,0 +1,55 @@
+"""
+logjson
+=======
+
+A Python logging Handler for JSON logs (with LogStash support)
+
+"""
+import logging
+import sys
+import json
+import datetime
+import platform
+import traceback
+
+
+__version__ = '2017.11.1'
+
+
+class JSONHandler(logging.StreamHandler):
+    def __init__(self, *args, logstash_mode=False, **kwargs):
+        # super().__init__(*args, stream=sys.stdout, **kwargs)
+        super().__init__(*args, **kwargs)
+        self.logstash_mode = logstash_mode
+
+    def format(self, record: logging.LogRecord):
+        """Don't even need a Formatter class at all."""
+        record.message = record.getMessage()
+        if record.exc_info:
+            record.exc_text = ''.join(traceback.format_exception(*record.exc_info))
+            del record.exc_info
+            record.message += '\n' + record.exc_text
+        # Actual isoformat. self.formatTime() is not the same.
+        record.created_iso = datetime.datetime.fromtimestamp(
+            record.created, datetime.timezone.utc
+        ).isoformat()
+
+        if self.logstash_mode:
+            d = {
+                '@message': record.message,
+                '@source_host': platform.node(),
+                '@timestamp': record.created_iso,
+                '@fields': record.__dict__,
+            }
+            # Avoid repetition
+            del record.message
+            del record.created_iso
+        else:
+            d = record.__dict__
+        return json.dumps(d, indent=2)
+
+
+
+logging.basicConfig(level='DEBUG', handlers=[JSONHandler()])
+
+
