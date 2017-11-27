@@ -25,23 +25,54 @@ def test_main():
     assert d['name'] == "blah"
 
 
+def test_logstash():
+
+    capture = []
+
+    class FileLike(object):
+        def write(self, data):
+            capture.append(data)
+
+    logger = logging.getLogger('ls')
+    logger.addHandler(logjson.JSONHandler(
+        logstash_mode=True,
+        stream=FileLike())
+    )
+
+    logger.info('logstash test')
+
+    print(capture)
+    assert capture
+
+    d = json.loads(capture[0])
+
+    assert d['@message'] == 'logstash test'
+    assert d['@fields']['name'] == 'ls'
 
 
+def test_exc():
 
-    # try:
-    #     1/0
-    # except:
-    #     logging.exception('Something went %s wrong:', 'horribly')
-    #
-    #
-    # logging.info('blah', extra=dict(a=1, b=2))
-    #
-    #
-    # logger = logging.getLogger('blah')
-    # logger.warning('Just checking %s', 'hell yeah')
-    #
-    # log2 = logwrap(logger, aaa=1, bbb=2)
-    # log2.info('But does it work tho?')
-    #
-    # log3 = logwrap(log2, ccc=3, ddd=4)
-    # log3.info('And the wrapper?')
+    capture = []
+
+    class FileLike(object):
+        def write(self, data):
+            capture.append(data)
+
+    logger = logging.getLogger('blah')
+    logger.addHandler(logjson.JSONHandler(stream=FileLike()))
+
+    try:
+        raise Exception('error')
+    except:
+        logger.exception('Something went wrong:')
+
+    print(capture)
+    assert capture
+
+    d = json.loads(capture[0])
+
+    assert d['message'].startswith('Something went wrong:')
+    assert d['name'] == 'blah'
+    assert d['levelname'] == 'ERROR'
+    assert d['levelno'] == 40
+    assert 'Traceback (most recent call last)' in d['exc_text']

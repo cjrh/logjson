@@ -11,6 +11,7 @@ import json
 import datetime
 import platform
 import traceback
+import copy
 
 
 __version__ = '2017.11.1'
@@ -28,9 +29,8 @@ class JSONHandler(logging.StreamHandler):
         # type: (logging.LogRecord) -> str
         """Don't even need a Formatter class at all."""
         record.message = record.getMessage()
-        if record.exc_info:
+        if hasattr(record, 'exc_info') and record.exc_info:
             record.exc_text = ''.join(traceback.format_exception(*record.exc_info))
-            del record.exc_info
             record.message += '\n' + record.exc_text
         # Actual isoformat. self.formatTime() is not the same.
         if sys.version_info.major == 2:  # pragma: no cover
@@ -47,12 +47,16 @@ class JSONHandler(logging.StreamHandler):
                 '@message': record.message,
                 '@source_host': platform.node(),
                 '@timestamp': record.created_iso,
-                '@fields': record.__dict__,
+                '@fields': copy.copy(record.__dict__)
             }
-            # Avoid repetition
-            del record.message
-            del record.created_iso
+            # Avoid duplicates
+            del d['@fields']['message']
+            del d['@fields']['created_iso']
+            # This doesn't serialise to JSON well.
+            del d['@fields']['exc_info']
         else:
-            d = record.__dict__
+            d = copy.copy(record.__dict__)
+            # This doesn't serialise to JSON well.
+            del d['exc_info']
 
         return json.dumps(d, indent=2 if self.pretty else None)
