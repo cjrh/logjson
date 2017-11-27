@@ -18,7 +18,7 @@ __version__ = '2017.11.1'
 class JSONHandler(logging.StreamHandler):
     def __init__(self, logstash_mode=False, pretty=False, *args, **kwargs):
         # super().__init__(*args, stream=sys.stdout, **kwargs)
-        super().__init__(*args, **kwargs)
+        super(JSONHandler, self).__init__(*args, **kwargs)
         self.logstash_mode = logstash_mode
         self.pretty = pretty
 
