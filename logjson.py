@@ -6,7 +6,6 @@ A Python logging Handler for JSON logs (with LogStash support)
 
 """
 import logging
-import sys
 import json
 import datetime
 import platform
@@ -17,10 +16,11 @@ __version__ = '2017.11.1'
 
 
 class JSONHandler(logging.StreamHandler):
-    def __init__(self, *args, logstash_mode=False, **kwargs):
+    def __init__(self, *args, logstash_mode=False, pretty=False, **kwargs):
         # super().__init__(*args, stream=sys.stdout, **kwargs)
         super().__init__(*args, **kwargs)
         self.logstash_mode = logstash_mode
+        self.pretty = pretty
 
     def format(self, record: logging.LogRecord):
         """Don't even need a Formatter class at all."""
@@ -46,10 +46,5 @@ class JSONHandler(logging.StreamHandler):
             del record.created_iso
         else:
             d = record.__dict__
-        return json.dumps(d, indent=2)
 
-
-
-logging.basicConfig(level='DEBUG', handlers=[JSONHandler()])
-
-
+        return json.dumps(d, indent=2 if self.pretty else None)
