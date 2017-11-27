@@ -12,12 +12,11 @@ def test_main():
             capture.append(data)
 
     logger = logging.getLogger('blah')
-    logger.addHandler(logjson.JSONHandler(stream=FileLike()))
+    logger.addHandler(logjson.JSONHandler(pretty=True, stream=FileLike()))
 
     logger.info('hi %s %s!', 'you', 'there')
 
-    print(capture)
-    assert capture
+    print(capture[0])
 
     d = json.loads(capture[0])
 
@@ -35,14 +34,14 @@ def test_logstash():
 
     logger = logging.getLogger('ls')
     logger.addHandler(logjson.JSONHandler(
+        pretty=True,
         logstash_mode=True,
         stream=FileLike())
     )
 
     logger.info('logstash test')
 
-    print(capture)
-    assert capture
+    print(capture[0])
 
     d = json.loads(capture[0])
 
