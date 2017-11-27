@@ -22,7 +22,8 @@ class JSONHandler(logging.StreamHandler):
         self.logstash_mode = logstash_mode
         self.pretty = pretty
 
-    def format(self, record: logging.LogRecord):
+    def format(self, record):
+        # type: (logging.LogRecord) -> str
         """Don't even need a Formatter class at all."""
         record.message = record.getMessage()
         if record.exc_info:
