@@ -14,7 +14,7 @@ import traceback
 import copy
 
 
-__version__ = '2017.11.1'
+__version__ = '2017.11.2'
 
 
 class JSONHandler(logging.StreamHandler):
