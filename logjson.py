@@ -5,6 +5,7 @@ logjson
 A Python logging Handler for JSON logs (with LogStash support)
 
 """
+import sys
 import logging
 import json
 import datetime
@@ -18,6 +19,7 @@ __version__ = '2017.11.1'
 class JSONHandler(logging.StreamHandler):
     def __init__(self, logstash_mode=False, pretty=False, *args, **kwargs):
         # super().__init__(*args, stream=sys.stdout, **kwargs)
+        print(kwargs)
         super(JSONHandler, self).__init__(*args, **kwargs)
         self.logstash_mode = logstash_mode
         self.pretty = pretty
@@ -31,9 +33,14 @@ class JSONHandler(logging.StreamHandler):
             del record.exc_info
             record.message += '\n' + record.exc_text
         # Actual isoformat. self.formatTime() is not the same.
-        record.created_iso = datetime.datetime.fromtimestamp(
-            record.created, datetime.timezone.utc
-        ).isoformat()
+        if sys.version_info.major == 2:  # pragma: no cover
+            record.created_iso = datetime.datetime.fromtimestamp(
+                record.created
+            ).isoformat()
+        else:
+            record.created_iso = datetime.datetime.fromtimestamp(
+                record.created, datetime.timezone.utc
+            ).isoformat()
 
         if self.logstash_mode:
             d = {
