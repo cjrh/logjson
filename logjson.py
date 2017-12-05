@@ -14,13 +14,12 @@ import traceback
 import copy
 
 
-__version__ = '2017.11.2'
+__version__ = '2017.12.1'
 
 
 class JSONHandler(logging.StreamHandler):
     def __init__(self, logstash_mode=False, pretty=False, *args, **kwargs):
         # super().__init__(*args, stream=sys.stdout, **kwargs)
-        print(kwargs)
         super(JSONHandler, self).__init__(*args, **kwargs)
         self.logstash_mode = logstash_mode
         self.pretty = pretty
