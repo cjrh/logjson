@@ -12,7 +12,9 @@ def test_main():
             capture.append(data)
 
     logger = logging.getLogger('blah')
-    logger.addHandler(logjson.JSONHandler(pretty=True, stream=FileLike()))
+    handler = logging.StreamHandler(stream=FileLike())
+    handler.setFormatter(logjson.JSONFormatter(pretty=True))
+    logger.addHandler(handler)
 
     logger.info('hi %s %s!', 'you', 'there')
 
@@ -33,11 +35,9 @@ def test_logstash():
             capture.append(data)
 
     logger = logging.getLogger('ls')
-    logger.addHandler(logjson.JSONHandler(
-        pretty=True,
-        logstash_mode=True,
-        stream=FileLike())
-    )
+    handler = logging.StreamHandler(stream=FileLike())
+    handler.setFormatter(logjson.JSONFormatter(pretty=True, logstash_mode=True))
+    logger.addHandler(handler)
 
     logger.info('logstash test')
 
@@ -58,7 +58,9 @@ def test_exc():
             capture.append(data)
 
     logger = logging.getLogger('blah')
-    logger.addHandler(logjson.JSONHandler(stream=FileLike()))
+    handler = logging.StreamHandler(stream=FileLike())
+    handler.setFormatter(logjson.JSONFormatter())
+    logger.addHandler(handler)
 
     try:
         raise Exception('error')

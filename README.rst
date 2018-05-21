@@ -34,7 +34,13 @@ logjson
     import logging
     import logjson
     logger = logging.getLogger('blah')
-    logger.addHandler(logjson.JSONHandler())
+
+    handler = logging.StreamHandler()
+    handler.setFormatter(
+        logjson.JSONFormatter(pretty=True)
+    )
+    logger.addHandler(handler)
+
     logger.info('hi %s %s!', 'you', 'there')
 
 Output:
@@ -68,12 +74,16 @@ Output:
       "created_iso": "2017-11-27T02:35:28.628575+00:00"
     }
 
-Logstash mode is a param away:
+Logstash mode is only one param away:
 
 .. code-block:: python
 
     logger = logging.getLogger('ls')
-    logger.addHandler(logjson.JSONHandler(logstash_mode=True))
+    handler = logging.StreamHandler()
+    handler.setFormatter(
+        logjson.JSONFormatter(pretty=True, logstash_mode=True)
+    )
+    logger.addHandler(handler)
     logger.info('logstash test')
 
 Output:
