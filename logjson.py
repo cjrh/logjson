@@ -14,7 +14,7 @@ import traceback
 import copy
 
 
-__version__ = '2017.12.1'
+__version__ = '2018.5.1'
 
 
 class JSONFormatter(logging.Formatter):
