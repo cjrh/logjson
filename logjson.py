@@ -59,4 +59,4 @@ class JSONFormatter(logging.Formatter):
             # This doesn't serialise to JSON well.
             del d['exc_info']
 
-        return json.dumps(d, indent=2 if self.pretty else None)
+        return json.dumps(d, default=str, indent=2 if self.pretty else None)
